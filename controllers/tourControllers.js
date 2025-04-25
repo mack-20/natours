@@ -1,6 +1,14 @@
 const Tour = require('../models/tourModel')
 const APIfeatures = require('../utils/APIfeatures')
 
+//controller to GET 5 best tours 
+exports.getTopTours = async (req, res, next) => {
+  //modify query in url
+  const query = '?fields=name,price,ratingsAverage,duration,difficulty&ratingsAverage[gte]=4.7&sort=ratingsAverage,price&limit=5'
+  req.url = `${req.url}${query}`
+  next()
+}
+
 // controller to GET ALL TOURS
 exports.getAllTours = async (req, res) => {
   try {
