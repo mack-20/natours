@@ -4,9 +4,14 @@ const APIfeatures = require('../utils/APIfeatures')
 //controller to GET 5 best tours 
 exports.getTopTours = async (req, res, next) => {
   //modify query in url
-  const query = '?fields=name,price,ratingsAverage,duration,difficulty&ratingsAverage[gte]=4.7&sort=ratingsAverage,price&limit=5'
-  req.url = `${req.url}${query}`
-  next()
+  try{
+    const query = '?fields=name,price,ratingsAverage,duration,difficulty&ratingsAverage[gte]=4.7&sort=ratingsAverage,price&limit=5'
+    req.url = `${req.url}${query}`
+    next()
+  }
+  catch(error){
+    console.log(error.message)
+  }
 }
 
 // controller to GET ALL TOURS
@@ -114,6 +119,41 @@ exports.deleteTour = async (req, res) => {
     })
 
   } catch (error) {
+    res.status(400).json({
+      status: 'FAIL🤦‍♂️',
+      message: error.message
+    })
+  }
+}
+
+// tour stats
+// 
+exports.getTourStats = async (req, res) => {
+  try{
+    const tourStats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } }
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty'},
+          numTours: { $sum: 1 },
+          avgRating: { $avg: '$ratingsAverage'},
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }
+        }
+      }
+    ])
+
+    res.status(200).json({
+      status: 'SUCCESS✔',
+      data: {
+        tourStats
+      }
+    })
+
+  }catch(error){
     res.status(400).json({
       status: 'FAIL🤦‍♂️',
       message: error.message

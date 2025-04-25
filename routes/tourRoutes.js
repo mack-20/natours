@@ -1,11 +1,16 @@
 // Import modules
 const { Router } = require('express')
-const { getAllTours, getTour, createTour, updateTour, deleteTour, getTopTours } = require('../controllers/tourControllers')
+const { getAllTours, getTour, createTour, updateTour, deleteTour, getTopTours, getTourStats } = require('../controllers/tourControllers')
 
 // Create tour router
 const tourRouter = new Router()
 
-//
+// tour stats
+tourRouter
+  .route('/tour-stats')
+  .get(getTourStats)
+
+// top 5 tours
 tourRouter
   .route('/top-5-tours')
   .get(getTopTours, getAllTours)
