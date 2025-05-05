@@ -1,9 +1,14 @@
 // Import modules
 const { Router } = require('express')
-const { getAllTours, getTour, createTour, updateTour, deleteTour, getTopTours, getTourStats } = require('../controllers/tourControllers')
+const { getAllTours, getTour, createTour, updateTour, deleteTour, getTopTours, getTourStats, getMonthlyPlan } = require('../controllers/tourControllers')
 
 // Create tour router
 const tourRouter = new Router()
+
+// monthly plan
+tourRouter
+  .route('/monthly-plan/:year')
+  .get(getMonthlyPlan)
 
 // tour stats
 tourRouter
