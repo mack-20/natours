@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel')
 const APIfeatures = require('../utils/APIfeatures')
+const AppError = require('../utils/appError')
 const catchAsync = require('../utils/catchAsync')
 
 //controller to GET 5 best tours 
@@ -35,6 +36,11 @@ exports.getTour = catchAsync(async (req, res) => {
   const tourId = req.params.id
   const tour = await Tour.findById(tourId)
 
+  // valid ID but no tour with that ID
+  if(!tour){
+    throw new AppError(`No Tour found with given ID(${tourId})`, 404)
+  }
+
   res.status(200).json({
     status: 'SUCCESS✔',
     data: {
@@ -65,6 +71,11 @@ exports.updateTour = catchAsync(async (req, res) => {
   const options = { returnDocument: 'after' }
   const tour = await Tour.findByIdAndUpdate(tourId, tourContentsToUpdate, options)
 
+    // valid ID but no tour with that ID
+  if(!tour){
+    throw new AppError(`No Tour found with given ID(${tourId})`, 404)
+  }
+
   res.status(200).json({
     status: 'SUCCESS✔',
     message: 'Tour updated successfully',
@@ -79,6 +90,11 @@ exports.deleteTour = catchAsync(async (req, res) => {
   const tourId = req.params.id
   const tour = await Tour.findByIdAndDelete(tourId)
 
+    // valid ID but no tour with that ID
+  if(!tour){
+    throw new AppError(`No Tour found with given ID(${tourId})`, 404)
+  }
+  
   res.status(204).json({
     status: 'SUCCESS✔',
     message: 'Tour deleted successfully'
