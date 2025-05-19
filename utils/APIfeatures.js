@@ -36,10 +36,24 @@ class APIfeatures{
     return this
   }
 
+  
+  limitFields(){
+    // 3. Field Limiting
+    if (this.clientQuery.fields){
+      const fields = this.clientQuery.fields.split(',').join(' ')
+      this.mongoQuery.select(fields)
+    }
+    else{
+      this.mongoQuery.select('-__v')
+    }
+    
+    return this
+  }
+  
   async paginate(){
     // 3. Pagination
     let pagination = {
-      total_records: await Tour.countDocuments(),
+      total_records: await this.mongoQuery.clone().countDocuments(),
       current_page: NaN,
       records_per_page: NaN,
       next_page: NaN,
@@ -67,19 +81,6 @@ class APIfeatures{
     }
 
     return {query: this.mongoQuery, pagination}
-  }
-
-  limitFields(){
-    // 3. Field Limiting
-    if (this.clientQuery.fields){
-      const fields = this.clientQuery.fields.split(',').join(' ')
-      this.mongoQuery.select(fields)
-    }
-    else{
-      this.mongoQuery.select('-__v')
-    }
-
-    return this
   }
 }
 
