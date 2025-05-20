@@ -3,6 +3,11 @@ const app = require('./app')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 
+// handling uncaught exception (synchronously) || should be at the top else any exception before will not be caught since its synchronous
+process.on('uncaughtException', (err) => {
+  console.error(`ERROR: ${err}`)
+})
+
 // Configure dotenv to read ENV variables
 dotenv.config({ path: './config.env' })
 
