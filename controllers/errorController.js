@@ -40,11 +40,14 @@ module.exports = (error, req, res, next) => {
   }
 
   const handleValidationErrorDB = (error) => {
-    return new AppError(error.message, 400)
+    const errors = Object.values(error.errors).map(el => el.message)
+
+    const message = `Invalid input data. ${errors.join('. ')}`
+    return new AppError(message, 400)
   }
 
-  const handleDuplicateKeyErrorDB = (error) => {
-    const message = `Tour '${error.keyValue.name}' already exists!`
+  const handleDuplicateFieldErrorDB = (error) => {
+    const message = `Duplicate field value: "${error.keyValue.name}". Please use another value!`
     return new AppError(message, 400)
   }
 
@@ -61,7 +64,7 @@ module.exports = (error, req, res, next) => {
     if(error.name === 'ValidationError') finalError = handleValidationErrorDB(error)
 
     // Handle duplicate key error
-    if(error.code === 11000) finalError = handleDuplicateKeyErrorDB(error)
+    if(error.code === 11000) finalError = handleDuplicateFieldErrorDB(error)
 
     sendErrorProd(finalError, res)
   }
