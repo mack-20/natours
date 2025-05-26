@@ -47,8 +47,11 @@ module.exports = (error, req, res, next) => {
   }
 
   const handleDuplicateFieldErrorDB = (error) => {
-    const message = `Duplicate field value: "${error.keyValue.name}". Please use another value!`
-    return new AppError(message, 400)
+    const field = Object.keys(error.keyValue)[0];
+    const value = error.keyValue[field];
+
+    const message = `Duplicate field value: ${value} already exists. Please use another ${field}!`;
+    return new AppError(message, 400);
   }
 
   if(process.env.NODE_ENV === 'development'){

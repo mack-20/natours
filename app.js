@@ -2,6 +2,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const tourRouter = require('./routes/tourRoutes')
+const userRouter = require('./routes/userRoute')
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController')
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true} )) // Parsing the URL params
 
 // set up '/api/v1/tours' route on app
 app.use('/api/v1/tours', tourRouter)
+app.use('/api/v1/users', userRouter)
 
 // handling routes not on the server
 // the idea is that, the code will only get here if it has not been handled by any of the routes above hence rendering it invalid
