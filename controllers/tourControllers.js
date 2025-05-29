@@ -23,7 +23,7 @@ exports.getAllTours = catchAsync(async (req, res) => {
   const tours = await query
   res.status(200).json({
     status: 'SUCCESS✔',
-    //tourCount: tours.length,
+    tourCount: tours.length,
     data: {
       tours
     },

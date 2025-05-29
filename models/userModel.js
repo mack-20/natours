@@ -21,14 +21,14 @@ const userSchema = mongoose.Schema({
   },
   photo:{
     type: String,
-    unique: true,
     trim: true
   },
   password:{
     type: String,
     trim: true,
     required: [true, 'Password is required'],
-    validate: [validator.isStrongPassword, 'Password not strong enough']
+    validate: [validator.isStrongPassword, 'Password not strong enough'],
+    select: false
   },
   passwordConfirm:{
     type: String,
@@ -44,6 +44,7 @@ const userSchema = mongoose.Schema({
 
 // For encryption of data
 userSchema.pre('save', async function(next){
+  // this is to avoid rehashing a hashed password: only runs when 'password' has been modified
   if(!this.isModified('password')) return next()
 
   // hashes the password if the password field was modified
@@ -54,6 +55,12 @@ userSchema.pre('save', async function(next){
 
   next()
 })
+
+// instance function
+userSchema.methods.correctPassword = async function(enteredPassword, hashedPassword){
+  const correct = await bcrypt.compare(enteredPassword, hashedPassword)
+  return correct
+}
 
 // Create user model from Schema
 const User = mongoose.model('User', userSchema)
