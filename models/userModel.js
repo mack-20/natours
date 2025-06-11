@@ -56,7 +56,7 @@ userSchema.pre('save', async function(next){
   next()
 })
 
-// instance function
+// instance function to check that the password is correct
 userSchema.methods.correctPassword = async function(enteredPassword, hashedPassword){
   const correct = await bcrypt.compare(enteredPassword, hashedPassword)
   return correct
