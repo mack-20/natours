@@ -42,6 +42,11 @@ const userSchema = mongoose.Schema({
   },
   passwordChangedAt: {
     type: Date
+  },
+  role:{
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    default: 'user'
   }
 })
 
@@ -60,7 +65,7 @@ userSchema.pre('save', async function(next){
 })
 
 // For setting the passwordChangedAt field
-userSchema.pre('save', async function(next){
+userSchema.pre('save', function(next){
   if(!this.isModified('password') || this.isNew) return next()
 
   // sets the passwordChangedAt field to the current date
@@ -79,6 +84,8 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
   // if the password was changed after the JWT was issued, then return true
   if(this.passwordChangedAt){
     const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10)
+
+    // if the password was changed after the JWT was issued, then return true
     return JWTTimestamp < changedTimestamp
   }
   // if the password was not changed after the JWT was issued, then return false
