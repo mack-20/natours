@@ -80,7 +80,17 @@ exports.protect = catchAsync(async (req, res, next) => {
   console.log(decoded_payload)
 
   // 3. Check if user still exists...not clear yet
+  const currentUser = User.findById(decoded_payload.id)
+  if(!freshUser){
+    throw new AppError('The user belonging to this token does not exist', 401) // 401 - Unauthorized
+  }
 
   // 4. Check if user changed password after token was issued....not clear yet
+  if(currentUser.changedPasswordAfter(decoded_payload.iat)){
+    throw new AppError('User recently changed password! Please log in again', 401) // 401 - Unauthorized
+  }
+
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser
   next()
 })

@@ -39,6 +39,9 @@ const userSchema = mongoose.Schema({
       },
       message: 'Passwords are not the same'
     },
+  },
+  passwordChangedAt: {
+    type: Date
   }
 })
 
@@ -56,10 +59,30 @@ userSchema.pre('save', async function(next){
   next()
 })
 
+// For setting the passwordChangedAt field
+userSchema.pre('save', async function(next){
+  if(!this.isModified('password') || this.isNew) return next()
+
+  // sets the passwordChangedAt field to the current date
+  this.passwordChangedAt = Date.now() - 1000 // subtracting 1000ms to ensure the JWT is not issued after the password change
+  next()
+})
+
 // instance function to check that the password is correct
 userSchema.methods.correctPassword = async function(enteredPassword, hashedPassword){
   const correct = await bcrypt.compare(enteredPassword, hashedPassword)
   return correct
+}
+
+// instance function to check if the password has been modified
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
+  // if the password was changed after the JWT was issued, then return true
+  if(this.passwordChangedAt){
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10)
+    return JWTTimestamp < changedTimestamp
+  }
+  // if the password was not changed after the JWT was issued, then return false
+  return false
 }
 
 // Create user model from Schema
