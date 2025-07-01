@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
+const crypt = require('crypto')
 
 
 // User Schema
@@ -47,7 +48,14 @@ const userSchema = mongoose.Schema({
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'],
     default: 'user'
-  }
+  },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false // this field will not be returned in queries by default
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date
 })
 
 // For encryption of data
@@ -90,6 +98,16 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
   }
   // if the password was not changed after the JWT was issued, then return false
   return false
+}
+
+
+userSchema.methods.createPasswordResetToken = function(){
+  const resetToken = crypt.randomBytes(32).toString('hex')
+
+  this.passwordResetToken = crypt.createHash('sha256').update(resetToken).digest('hex')
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000 // 10 minutes
+
+  return resetToken
 }
 
 // Create user model from Schema
